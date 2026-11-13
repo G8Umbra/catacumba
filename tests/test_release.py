@@ -171,6 +171,11 @@ class TestEnglishOnly(unittest.TestCase):
 
 
 # ------------------------------------------------------------------ 2. neutral names
+def no_maker_names(txt):
+    """The public maker names and the company slogan may appear only in the README and the optional About section; nowhere else."""
+    return [w for w in ("g8umbra", "templogic", "better diagno" + "stics") if w in txt.lower()]
+
+
 class TestRemovedFeaturesStayRemoved(unittest.TestCase):
     """Two features were removed for provenance reasons. Their words are built from parts so this file does not match itself."""
 
@@ -209,16 +214,6 @@ class TestRemovedFeaturesStayRemoved(unittest.TestCase):
         self.assertEqual(section[0], "Copyright (c) 2026 G8Umbra")
         self.assertEqual(readme.count("Copyright (c)"), 1)           # one holder line, no other names or organisations
 
-    def test_the_organisation_tagline_is_not_shipped(self):
-        """The tagline of an unrelated organisation must not appear in Community (owner decision: no association)."""
-        parts = ("Better Diagno" + "stics", "Better Deci" + "sions", "Better Li" + "ves")
-        for f in self.shipped():
-            if f.name in ("INTEGRATION.md",):
-                continue
-            txt = f.read_text(encoding="utf-8", errors="replace")
-            for w in parts:
-                self.assertNotIn(w, txt, f"{f.relative_to(ROOT)} still carries the removed tagline")
-
     def test_the_remaining_tabs_and_views_are_consistent(self):
         html = (STATIC / "index.html").read_text(encoding="utf-8")
         js = (STATIC / "app.js").read_text(encoding="utf-8")
@@ -240,7 +235,8 @@ class TestRemovedFeaturesStayRemoved(unittest.TestCase):
     def test_the_readme_lists_only_what_exists_and_states_how_it_is_built(self):
         txt = (ROOT / "README.md").read_text(encoding="utf-8")
         self.assertIn("## How it is built", txt)
-        self.assertIn("Catacumba Community is developed with AI assistance (Claude Code, by Anthropic) under the direction of G8Umbra, who maintains it.", txt)
+        self.assertIn("Catacumba Community is developed with AI assistance under the direction of G8Umbra, who maintains it.", txt)
+        self.assertIn("Claude Code (Anthropic), Codex (OpenAI) and ChatGPT (OpenAI)", txt)
         self.assertIn("ASCII banner maker", txt)
 
 
@@ -263,26 +259,38 @@ class TestNoAccountLinksOrEmails(unittest.TestCase):
 
 
 class TestNeutralNames(unittest.TestCase):
-    def test_the_organisation_name_appears_nowhere_in_the_shipped_tree(self):
-        palabra = "templo" + "gic"
-        archivos = [p for p in sorted(ROOT.rglob("*")) if p.is_file() and ".git" not in p.relative_to(ROOT).parts
-                    and "personal" not in p.relative_to(ROOT).parts and "__pycache__" not in p.parts
-                    and p.name not in ("INTEGRATION.md", "requests_to_lead.md")]
-        self.assertGreater(len(archivos), 10)
-        for f in archivos:
-            self.assertNotIn(palabra, f.read_text(encoding="utf-8", errors="ignore").lower(), str(f.relative_to(ROOT)))
+    STATEMENT = "Catacumba Community, developed by G8Umbra, associated with TempLogic Systems."
+    SLOGAN = "Better Diagno" + "stics, Better Decisions, Better Lives."
 
-    def test_the_readme_names_only_the_maker(self):
-        lineas = (ROOT / "README.md").read_text(encoding="utf-8").splitlines()
-        i = lineas.index("Catacumba Community is made by G8Umbra.")          # exact sentence, wherever it sits
-        self.assertEqual(lineas.count("Catacumba Community is made by G8Umbra."), 1)
-        self.assertEqual((lineas[i - 1], lineas[i + 1]), ("", ""))             # its own paragraph
-        self.assertLess(i, 15)                                                 # near the top, in the introduction
-
-    def test_the_about_dialog_has_no_maker_section_and_no_outbound_link(self):
+    def test_the_maker_names_and_the_slogan_appear_only_in_the_readme_and_the_optional_about_section(self):
+        for f in community_files({".py", ".js", ".css", ".sh", ".svg"}):
+            if f.name in ("test_release.py", "test_community.py"):
+                continue
+            self.assertEqual(no_maker_names(f.read_text(encoding="utf-8")), [], str(f.relative_to(ROOT)))
         html = (STATIC / "index.html").read_text(encoding="utf-8")
-        self.assertNotIn("ac-maker", html)
-        self.assertEqual(re.findall(r'href="(https?://[^"]+)"', html), [])
+        html = re.sub(r'<section id="ac-maker".*?</section>', "", html, flags=re.S)
+        html = re.sub(r'<label class="casilla"><input type="checkbox" id="ac-mostrar-tl">.*?</label>', "", html, flags=re.S)
+        self.assertEqual(no_maker_names(html), [])
+
+    def test_the_readme_states_the_approved_association_exactly_once_near_the_top(self):
+        lineas = (ROOT / "README.md").read_text(encoding="utf-8").splitlines()
+        self.assertEqual(lineas.count(self.STATEMENT), 1)
+        i = lineas.index(self.STATEMENT)
+        self.assertLess(i, 15)
+        self.assertEqual((lineas[i - 1], lineas[i + 1]), ("", ""))
+        self.assertIn("https://templogicsystems.com/", lineas[i + 2])           # the plain link sits right under it
+        self.assertIn("*" + self.SLOGAN + "*", lineas[i + 2])                   # the slogan: understated, labelled as the company slogan
+        self.assertIn("slogan:", lineas[i + 2])
+
+    def test_the_hideable_about_section_has_the_statement_one_plain_link_and_the_slogan(self):
+        html = (STATIC / "index.html").read_text(encoding="utf-8")
+        bloque = re.search(r'<section id="ac-maker".*?</section>', html, flags=re.S).group(0)
+        self.assertIn(self.STATEMENT, bloque)
+        self.assertEqual(re.findall(r'href="(https?://[^"]+)"', bloque), ["https://templogicsystems.com/"])
+        self.assertIn('rel="noopener noreferrer"', bloque)
+        self.assertIn(self.SLOGAN, bloque)
+        self.assertIn("slogan", bloque.lower())
+        self.assertIn('id="ac-mostrar-tl"', html)                               # and it can be hidden
 
     def test_the_backgrounds_are_exactly_the_generic_set(self):
         from_py = re.search(r"TEMAS = \{([^}]*)\}", (ROOT / "servidor.py").read_text(encoding="utf-8")).group(1)
@@ -442,7 +450,7 @@ class TestLocalOnly(unittest.TestCase):
                 continue
             txt = f.read_text(encoding="utf-8")
             for host in re.findall(r"https?://([\w.-]+)", txt):
-                self.assertIn(host, {"127.0.0.1", "localhost", "mozilla.org", "duckduckgo.com", "www.google.com",
+                self.assertIn(host, {"127.0.0.1", "localhost", "mozilla.org", "templogicsystems.com", "duckduckgo.com", "www.google.com",
                                      "www.w3.org"}, f"{f.name}: {host}")
 
 
