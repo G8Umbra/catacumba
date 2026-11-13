@@ -386,7 +386,7 @@ class TestPluginAbsentOrBroken(unittest.TestCase):
             self.assertEqual((todo["repos"], todo["extras"]), ([], []))
             for ruta in ("/api/monitor/fuentes", "/api/monitor/datos?fuente=x", "/plugin/monitor.js", "/plugin/monitor.html"):
                 self.assertEqual(fetch(port, ruta)[0], 404, ruta)
-            for ruta in ("/estatico/app.js", "/estatico/estilo.css", "/estatico/pomodoro.js", "/estatico/ascii.js"):
+            for ruta in ("/estatico/app.js", "/estatico/estilo.css", "/estatico/ascii.js"):
                 self.assertEqual(fetch(port, ruta)[0], 200, ruta)
             # the first-run section is part of the served page
             self.assertIn(b'id="bienvenida"', page)
@@ -478,13 +478,12 @@ class TestInterface(unittest.TestCase):
         ids = {a["id"] for _, a in parse_index() if "id" in a}
         js = (ROOT / "estatico" / "app.js").read_text(encoding="utf-8")
         usados = set(re.findall(r'\$\("#([\w-]+)"\)', js))
-        for archivo in ("pomodoro.js", "ascii.js"):
-            usados |= set(re.findall(r'getElementById\("([\w-]+)"\)', (ROOT / "estatico" / archivo).read_text(encoding="utf-8")))
+        usados |= set(re.findall(r'querySelector\("#([\w-]+)"\)', (ROOT / "estatico" / "ascii.js").read_text(encoding="utf-8")))
         self.assertEqual(sorted(usados - ids), [], "the script refers to elements that do not exist (dead UI)")
 
     def test_every_tab_has_a_view(self):
         tabs = {a["data-tipo"] for t, a in parse_index() if t == "button" and "data-tipo" in a}
-        self.assertEqual(tabs, {"todo", "repo", "proyecto", "carpeta", "pagina", "favoritos", "fragmentos", "pomodoro", "ascii"})
+        self.assertEqual(tabs, {"todo", "repo", "proyecto", "carpeta", "pagina", "favoritos", "ascii"})
 
     def test_basic_accessibility_of_the_page(self):
         tags = parse_index()

@@ -94,21 +94,6 @@ dialog h3{font-size:.95rem;margin:14px 0 2px}
 @media (max-width:760px){.busquedas{grid-template-columns:1fr}}
 @media (max-width:480px){.temas,.fotos{grid-template-columns:repeat(3,1fr)}}
 
-#fragmentos[hidden]{display:none}
-.fragmentos-cabecera{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:14px}
-.fragmentos-cabecera h2{font-size:1.15rem;margin:0}
-.fragmentos-cabecera .nota{margin:2px 0 0}
-.fragmentos-acciones{display:flex;align-items:center;gap:8px;min-width:min(440px,55%)}
-#buscar-fragmentos{min-width:0;flex:1;padding:8px 10px;border:1px solid var(--linea);border-radius:10px;background:var(--tarjeta);color:var(--texto);font:inherit}
-#fragmentos-aviso{min-height:1.2em;margin:0 0 8px;color:var(--suave);font-size:.88rem}
-#lista-fragmentos{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:12px}
-.fragmento{display:flex;flex-direction:column;gap:10px;min-width:0;padding:14px;background:var(--tarjeta);border:1px solid var(--linea);border-radius:14px;box-shadow:var(--sombra)}
-.fragmento h3{margin:0;font-size:1rem;overflow-wrap:anywhere}
-.fragmento-codigo{margin:0;padding:12px;max-height:300px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:var(--fondo);border:1px solid var(--linea);border-radius:10px;font: .84rem/1.5 ui-monospace,monospace;color:var(--texto)}
-.fragmento-acciones{display:flex;justify-content:flex-end;gap:8px;margin-top:auto}
-body.con-fondo .fragmento{background:color-mix(in srgb,var(--tarjeta) 80%,transparent);backdrop-filter:blur(3px)}
-@media (max-width:560px){.fragmentos-cabecera{align-items:stretch;flex-direction:column;gap:10px}.fragmentos-acciones{min-width:0}.fragmentos-acciones button{white-space:nowrap}}
-
 /* ---- v0.1 UX: accessibility, first run, navigation, continue, about ---- */
 :focus-visible{outline:3px solid var(--azul);outline-offset:2px}
 .saltar{position:absolute;left:8px;top:-60px;z-index:10;padding:8px 14px;background:var(--azul);color:#fff;border-radius:8px;text-decoration:none}

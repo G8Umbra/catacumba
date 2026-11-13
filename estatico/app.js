@@ -10,12 +10,6 @@ const estado = { datos: null, tipo: "todo", busca: "", abierto: null, prefs: nul
 const CLAVE_VISTA = "catacumba_view";      // per-browser convenience only (sort order and filter)
 const CLAVE_TEMA = "catacumba_theme";
 const CLAVE_PREFS = "catacumba_prefs";
-const CLAVE_FRAGMENTOS = "catapulta_snippets";
-const FRAGMENTOS_EJEMPLO = [
-  { id: 1, title: "Python - Servidor HTTP Simple", code: "python3 -m http.server 8000" },
-  { id: 2, title: "Git - Quick commit", code: 'git add . && git commit -m "fix: quick update" && git push' },
-];
-let fragmentos = leerFragmentos();
 const TEMAS = [["liso", "Plain"], ["noche", "Night"], ["blueprint", "Blueprint"], ["compass", "Compass"],
   ["frio", "Frost"], ["atardecer", "Sunset"], ["bosque", "Forest"]];
 const BUSCAR_WEB = { duckduckgo: "https://duckduckgo.com/?q=", google: "https://www.google.com/search?q=" };
@@ -117,24 +111,15 @@ function abierto(id) {
 
 function pintar() {
   const verFavoritos = estado.tipo === "favoritos";
-  const verFragmentos = estado.tipo === "fragmentos";
-  const verPomodoro = estado.tipo === "pomodoro";
   const verAscii = estado.tipo === "ascii";
-  const verTarjetas = !(verFragmentos || verPomodoro || verAscii);
+  const verTarjetas = !verAscii;
   const vacio = Boolean(estado.datos?.onboarding?.vacio);
-  $("#fragmentos").hidden = !verFragmentos;
-  $("#pomodoro").hidden = !verPomodoro;
   $("#ascii-studio").hidden = !verAscii;
   $("#bienvenida").hidden = !(verTarjetas && vacio);
   $("#barra-vista").hidden = !(verTarjetas && !vacio);
   $("#continuar").hidden = true;
   $("#tarjetas").hidden = !verTarjetas || vacio;
   for (const b of document.querySelectorAll("#pestanas button")) b.setAttribute("aria-pressed", String(b.dataset.tipo === estado.tipo));
-  if (verFragmentos) {
-    pintarFragmentos();
-    return;
-  }
-  if (verPomodoro) return;
   if (verAscii) return;
   if (vacio) {
     pintarBienvenida();
@@ -215,117 +200,6 @@ async function agregarComoProyecto() {
   } catch (e) {
     $("#bv-error").textContent = e.message;
   }
-}
-
-function leerFragmentos() {
-  try {
-    const guardados = localStorage.getItem(CLAVE_FRAGMENTOS);
-    if (guardados === null) return [...FRAGMENTOS_EJEMPLO];
-    const datos = JSON.parse(guardados);
-    if (!Array.isArray(datos)) return [];
-    return datos.filter((item) => item && (typeof item.id === "string" || typeof item.id === "number") &&
-      typeof item.title === "string" && typeof item.code === "string");
-  } catch {
-    return [...FRAGMENTOS_EJEMPLO];
-  }
-}
-
-function guardarFragmentos() {
-  try {
-    localStorage.setItem(CLAVE_FRAGMENTOS, JSON.stringify(fragmentos));
-    return true;
-  } catch {
-    $("#fragmentos-aviso").textContent = "Could not save the snippets in this browser.";
-    return false;
-  }
-}
-
-function pintarFragmentos() {
-  const lista = $("#lista-fragmentos");
-  lista.replaceChildren();
-  const busca = $("#buscar-fragmentos").value.trim().toLowerCase();
-  const visibles = fragmentos.filter((item) => !busca || `${item.title}\n${item.code}`.toLowerCase().includes(busca));
-  if (!visibles.length) {
-    lista.append(nuevo("p", { clase: "linea", texto: fragmentos.length ? "No snippets match." : "No snippets saved yet." }));
-    return;
-  }
-  for (const item of visibles) {
-    const codigo = nuevo("pre", { clase: "fragmento-codigo" }, [nuevo("code", { texto: item.code })]);
-    const acciones = nuevo("div", { clase: "fragmento-acciones" }, [
-      nuevo("button", { type: "button", texto: "Copy", onclick: () => copiarFragmento(item.code) }),
-      nuevo("button", { type: "button", texto: "Delete", onclick: () => eliminarFragmento(item.id) }),
-    ]);
-    lista.append(nuevo("article", { clase: "fragmento" }, [nuevo("h3", { texto: item.title }), codigo, acciones]));
-  }
-}
-
-async function copiarFragmento(codigo) {
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(codigo);
-    } else {
-      copiarConSeleccion(codigo);
-    }
-    $("#fragmentos-aviso").textContent = "Snippet copied.";
-  } catch {
-    try {
-      copiarConSeleccion(codigo);
-      $("#fragmentos-aviso").textContent = "Snippet copied.";
-    } catch {
-      $("#fragmentos-aviso").textContent = "Could not copy the snippet.";
-    }
-  }
-}
-
-function copiarConSeleccion(codigo) {
-  const campo = document.createElement("textarea");
-  campo.value = codigo;
-  campo.setAttribute("readonly", "");
-  campo.style.position = "fixed";
-  campo.style.opacity = "0";
-  document.body.append(campo);
-  campo.select();
-  const copiado = document.execCommand("copy");
-  campo.remove();
-  if (!copiado) throw new Error("Could not copy");
-}
-
-function eliminarFragmento(id) {
-  const anteriores = fragmentos;
-  fragmentos = fragmentos.filter((item) => String(item.id) !== String(id));
-  if (!guardarFragmentos()) {
-    fragmentos = anteriores;
-    return;
-  }
-  $("#fragmentos-aviso").textContent = "Snippet deleted.";
-  pintarFragmentos();
-}
-
-function abrirDialogoFragmento() {
-  $("#form-fragmento").reset();
-  $("#fragmento-error").textContent = "";
-  $("#dialogo-fragmento").showModal();
-}
-
-function agregarFragmento(ev) {
-  ev.preventDefault();
-  const datos = new FormData(ev.currentTarget);
-  const titulo = String(datos.get("titulo") || "").trim();
-  const codigo = String(datos.get("codigo") || "").trim();
-  if (!titulo || !codigo) {
-    $("#fragmento-error").textContent = "Write a title and a snippet.";
-    return;
-  }
-  const anteriores = fragmentos;
-  const id = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-  fragmentos = [...fragmentos, { id, title: titulo, code: codigo }];
-  if (!guardarFragmentos()) {
-    fragmentos = anteriores;
-    return;
-  }
-  $("#dialogo-fragmento").close();
-  $("#fragmentos-aviso").textContent = "Snippet saved in this browser.";
-  pintarFragmentos();
 }
 
 function tarjeta(item) {
@@ -720,10 +594,6 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#agregar").addEventListener("click", abrirDialogo);
   $("#d-cancelar").addEventListener("click", () => $("#dialogo").close());
   $("#form-agregar").addEventListener("submit", agregar);
-  $("#nuevo-fragmento").addEventListener("click", abrirDialogoFragmento);
-  $("#fragmento-cancelar").addEventListener("click", () => $("#dialogo-fragmento").close());
-  $("#form-fragmento").addEventListener("submit", agregarFragmento);
-  $("#buscar-fragmentos").addEventListener("input", pintarFragmentos);
   $("#cerrar").addEventListener("click", cerrarPanel);
   const hayDialogo = () => document.querySelector("dialog[open]") !== null;
   document.addEventListener("keydown", (e) => {

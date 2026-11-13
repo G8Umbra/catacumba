@@ -27,7 +27,7 @@ Catacumba Community is made by G8Umbra, associated with TempLogic Systems (https
   The home view shows the last items you worked on. You can view, export, pause and clear all of it in **About**.
 - **Comfortable to use.** Works from phone width up, light and dark theme (follows your system, or pick one),
   full keyboard use, visible focus, skip link, reduced-motion respected.
-- **Small tools included:** snippets (stored in your browser), a Pomodoro timer and an ASCII banner maker.
+- **A small extra tool:** an ASCII banner maker for text headers.
 - **Optional, easy to ignore:** an About page with an optional section of plain links about its maker. It can be hidden with one checkbox.
 
 ## Run it
@@ -56,7 +56,7 @@ yourself: the "Does it answer?" button on a web page you added, and the web-sear
 | Your list and settings | `catacumba.json` in your config folder (default `~/.config/catacumba/`, or the path in `CATACUMBA_CONFIG`) | the folders and pages you added, the folders searched for git projects, favourites, background and search-engine choice, and the two switches "remember where I left off" and "show the About links" |
 | Where you left off | `continue.json` in the same folder (or in `CATACUMBA_DATA_DIR`) | per item: its name and place, when you last opened it, how many times, the note you wrote, and the names and times (never the contents) of the files changed most recently in it |
 | Your notes | inside `continue.json` | the text you type in "Note to my future self" (500 characters at most per item) |
-| Browser conveniences | your browser's local storage | theme, sort order, snippets |
+| Browser conveniences | your browser's local storage | theme and sort order |
 
 - **See it:** **About** shows the exact paths and how much is saved. The files are plain JSON; open them in any editor.
 - **Export it:** **About**, "Export as a file" (also `GET /api/continue/export`) downloads your history as one JSON file.
@@ -87,6 +87,10 @@ returns a dict with a required `name` and any of these optional keys:
 | `ui` | `{styles, scripts, fragment}` served from `personal/static/` under `/plugin/`; fragment elements with `data-slot="header-actions"` or `data-slot="main-top"` are placed in the page |
 
 A plugin that fails to load is reported in `About` and on stderr; the app keeps running without it.
+
+## How it is built
+
+Catacumba Community is developed with AI assistance (Claude Code, by Anthropic) under the direction of G8Umbra, who maintains it.
 
 ## License
 

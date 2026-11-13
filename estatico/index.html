@@ -11,8 +11,6 @@
 <link rel="icon" href="/estatico/icono.svg">
 <link rel="stylesheet" href="/estatico/estilo.css">
 <script src="/estatico/app.js" defer></script>
-<link rel="stylesheet" href="/estatico/pomodoro.css">
-<script src="/estatico/pomodoro.js" defer></script>
 <link rel="stylesheet" href="/estatico/ascii.css">
 <script src="/estatico/ascii.js" defer></script>
 </head>
@@ -39,8 +37,6 @@
   <button type="button" data-tipo="carpeta">Folders</button>
   <button type="button" data-tipo="pagina">Pages</button>
   <button type="button" data-tipo="favoritos">Favorites</button>
-  <button type="button" data-tipo="fragmentos">Snippets</button>
-  <button type="button" data-tipo="pomodoro">Pomodoro</button>
   <button type="button" data-tipo="ascii">ASCII art</button>
 </nav>
 <main id="principal" tabindex="-1">
@@ -87,38 +83,6 @@
   </section>
   <p id="aviso" role="status"></p>
   <section id="tarjetas" aria-live="polite"></section>
-  <section id="fragmentos" hidden aria-labelledby="fragmentos-titulo">
-    <div class="fragmentos-cabecera">
-      <div><h2 id="fragmentos-titulo">Snippets</h2><p class="nota">Saved in this browser; they are never run or sent anywhere.</p></div>
-      <div class="fragmentos-acciones">
-        <input id="buscar-fragmentos" type="search" placeholder="Search snippets…" aria-label="Search snippets" autocomplete="off">
-        <button id="nuevo-fragmento" type="button" class="primario">+ New snippet</button>
-      </div>
-    </div>
-    <p id="fragmentos-aviso" role="status" aria-live="polite"></p>
-    <div id="lista-fragmentos"></div>
-  </section>
-  <section id="pomodoro" hidden aria-labelledby="pomodoro-titulo">
-    <div class="pomodoro-shell">
-      <div class="pomodoro-cabecera">
-        <div><span class="pomodoro-etiqueta">MODO</span><h2 id="pomodoro-modo">FOCUS</h2></div>
-        <span id="pomodoro-sesion">Session 1/4</span>
-      </div>
-      <h2 id="pomodoro-titulo" class="pomodoro-titulo">Pomodoro</h2>
-      <p id="pomodoro-reloj" class="pomodoro-reloj" role="timer" aria-live="off">25:00</p>
-      <progress id="pomodoro-progreso" max="1500" value="1500" aria-label="Timer progress"></progress>
-      <div class="pomodoro-controles">
-        <button id="pomodoro-toggle" type="button" class="primario">Start</button>
-        <button id="pomodoro-reset" type="button">Reset</button>
-      </div>
-      <div class="pomodoro-modos" role="group" aria-label="Timer length">
-        <button type="button" data-pomodoro-mode="work" aria-pressed="true">Focus · 25 min</button>
-        <button type="button" data-pomodoro-mode="short" aria-pressed="false">Break · 5 min</button>
-        <button type="button" data-pomodoro-mode="long" aria-pressed="false">Long break · 15 min</button>
-      </div>
-      <p id="pomodoro-aviso" role="status" aria-live="polite">Ready to focus.</p>
-    </div>
-  </section>
   <section id="ascii-studio" hidden aria-labelledby="ascii-titulo">
     <div class="ascii-shell">
       <div class="ascii-cabecera">
@@ -177,19 +141,6 @@
     </label>
     <p id="f-error" class="error" role="alert"></p>
     <div class="botones"><button type="button" id="f-cerrar" class="primario">Done</button></div>
-  </form>
-</dialog>
-
-<dialog id="dialogo-fragmento" aria-labelledby="t-fragmento">
-  <form id="form-fragmento">
-    <h2 id="t-fragmento">New snippet</h2>
-    <label>Title <input name="titulo" required maxlength="100" autocomplete="off"></label>
-    <label>Code or command <textarea name="codigo" required maxlength="20000" rows="8" spellcheck="false"></textarea></label>
-    <p id="fragmento-error" class="error" role="alert"></p>
-    <div class="botones">
-      <button type="button" id="fragmento-cancelar">Cancel</button>
-      <button type="submit" class="primario">Save</button>
-    </div>
   </form>
 </dialog>
 

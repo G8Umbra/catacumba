@@ -37,7 +37,7 @@ def community_files(suffixes):
 # ------------------------------------------------------------------ 1. English only
 SPANISH_WORDS = set("""el la los las del para con sin una sus aquí todavía también ahora hay está esta esa ese ruta carpeta carpetas
 página páginas repositorio repositorios agregar buscar guardar cancelar quitar abrir eliminar copiar leyendo nuevo nada solo
-máquina usuario nombre fragmento fragmentos descanso enfoque iniciar actualizar favoritos fondo cambios sesión resultado texto
+máquina usuario nombre descanso enfoque iniciar actualizar favoritos fondo cambios sesión resultado texto
 escriba escoja marque tarjeta lista pantalla dónde qué cómo porque puede pude encontré encuentra existe tiene debe escoja
 sí hace días momento ayer último últimos""".split())
 ACCENT = re.compile(r"[áéíóúñ¿¡ÁÉÍÓÚÑ]")
@@ -174,6 +174,63 @@ class TestEnglishOnly(unittest.TestCase):
 def no_maker_names(txt):
     """The public maker names may appear only in the optional About section (and the README); nowhere else."""
     return [w for w in ("g8umbra", "templogic") if w in txt.lower()]
+
+
+class TestRemovedFeaturesStayRemoved(unittest.TestCase):
+    """Two features were removed for provenance reasons. Their words are built from parts so this file does not match itself."""
+
+    WORDS = ("pomo" + "doro", "snip" + "pet", "fragmen" + "to", "catapul" + "ta")
+
+    def shipped(self, root=None):
+        """Files a user gets. A clone also holds .git (binary objects): that is version-control metadata, not a shipped file."""
+        root = Path(root) if root else ROOT
+        return [p for p in sorted(root.rglob("*")) if p.is_file() and "personal" not in p.relative_to(root).parts
+                and not ({".git", "__pycache__"} & set(p.relative_to(root).parts)) and p.name != "requests_to_lead.md"]
+
+    def test_the_scan_works_in_a_clone_with_git_metadata_and_binary_files(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / ".git" / "objects" / "ab").mkdir(parents=True)
+            (root / ".git" / "objects" / "ab" / "cdef").write_bytes(b"\x78\x01\xf6\xff\x00binary object")
+            (root / "logo.png").write_bytes(b"\x89PNG\xf6\xff")
+            (root / "README.md").write_text("plain\n", encoding="utf-8")
+            self.assertEqual([f.name for f in self.shipped(root)], ["README.md", "logo.png"])
+            for f in self.shipped(root):                       # binary files must be readable by the scan without crashing
+                f.read_text(encoding="utf-8", errors="replace")
+
+    def test_no_trace_of_the_removed_features_in_any_shipped_file(self):
+        archivos = self.shipped()
+        self.assertGreater(len(archivos), 10)
+        for f in archivos:
+            self.assertFalse(f.name.lower().startswith(self.WORDS), f"file of a removed feature: {f.name}")
+            txt = f.read_text(encoding="utf-8", errors="replace").lower()
+            for w in self.WORDS:
+                self.assertNotIn(w, txt, f"{f.relative_to(ROOT)} still mentions a removed feature ({w})")
+
+    def test_the_remaining_tabs_and_views_are_consistent(self):
+        html = (STATIC / "index.html").read_text(encoding="utf-8")
+        js = (STATIC / "app.js").read_text(encoding="utf-8")
+        tabs = re.findall(r'data-tipo="(\w+)"', html)
+        self.assertEqual(tabs, ["todo", "repo", "proyecto", "carpeta", "pagina", "favoritos", "ascii"])
+        for t in ("todo", "repo", "proyecto", "carpeta", "pagina", "favoritos"):          # card views share one list
+            self.assertIn(t, ("todo", "repo", "proyecto", "carpeta", "pagina", "favoritos"))
+        self.assertIn('estado.tipo === "ascii"', js)                                    # the only separate view
+        self.assertIn('id="ascii-studio"', html)
+        self.assertEqual(len(re.findall(r"<section[^>]*\bhidden\b", html)), len(set(re.findall(r'<section id="([\w-]+)"[^>]*\bhidden\b', html))))
+        scripts = re.findall(r'<script src="/estatico/([\w.]+)"', html)
+        self.assertEqual(sorted(scripts), ["app.js", "ascii.js"])
+        links = re.findall(r'<link rel="stylesheet" href="/estatico/([\w.]+)"', html)
+        self.assertEqual(sorted(links), ["ascii.css", "estilo.css"])
+        for nombre in scripts + links:
+            self.assertTrue((STATIC / nombre).is_file(), nombre)
+        self.assertEqual(sorted(p.name for p in STATIC.iterdir()), ["app.js", "ascii.css", "ascii.js", "estilo.css", "icono.svg", "index.html"])
+
+    def test_the_readme_lists_only_what_exists_and_states_how_it_is_built(self):
+        txt = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn("## How it is built", txt)
+        self.assertIn("Catacumba Community is developed with AI assistance (Claude Code, by Anthropic) under the direction of G8Umbra, who maintains it.", txt)
+        self.assertIn("ASCII banner maker", txt)
 
 
 class TestNoAccountLinksOrEmails(unittest.TestCase):
