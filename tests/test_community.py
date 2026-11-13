@@ -323,7 +323,7 @@ class TestContinueHttp(Base):
         self.assertEqual(self.call("GET", "/api/plugin")[1], {"loaded": False})
 
     def test_preferences_accept_only_real_booleans_for_the_new_switches(self):
-        for k in ("recordar", "show_maker_links"):
+        for k in ("recordar",):
             self.assertEqual(self.call("POST", "/api/preferencias", {k: False})[1]["preferencias"][k], False)
             self.assertEqual(self.call("POST", "/api/preferencias", {k: "no"})[0], 400)
             self.assertEqual(self.call("POST", "/api/preferencias", {k: 0})[0], 400)
@@ -525,7 +525,7 @@ class TestInterface(unittest.TestCase):
             txt = f.read_text(encoding="utf-8")
             if f.name == "index.html":
                 hallados = re.findall(r"""(?:src|href)=["'](https?://[^"']+)""", txt)
-                self.assertEqual(hallados, ["https://templogicsystems.com/"], "only the optional About link may point outside")
+                self.assertEqual(hallados, [], "the page links to nothing outside this computer")
             elif f.suffix != ".js":
                 self.assertIsNone(ext.search(txt), f.name)
         js = (ROOT / "estatico" / "app.js").read_text(encoding="utf-8")

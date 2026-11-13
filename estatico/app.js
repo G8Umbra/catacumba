@@ -505,7 +505,6 @@ async function abrirAcerca() {
     estado.continuar = cont;
     $("#ac-edicion").textContent = acerca.edition;
     $("#ac-version").textContent = acerca.version;
-    $("#ac-lema").textContent = acerca.slogan;
     $("#ac-config").textContent = acerca.config_path;
     $("#ac-continue").textContent = acerca.continue_path;
     pintarAcerca();
@@ -517,8 +516,6 @@ function pintarAcerca() {
   const cont = estado.continuar || { projects: [] };
   const notas = cont.projects.filter((x) => x.note).length;
   $("#ac-recordar").checked = p.recordar !== false;
-  $("#ac-mostrar-tl").checked = p.show_maker_links !== false;
-  $("#ac-maker").hidden = p.show_maker_links === false;
   $("#ac-cuenta").textContent = cont.projects.length
     ? `Saved for ${cont.projects.length} item(s), ${notas} with a note.` : "Nothing is saved yet.";
   $("#ac-borrar").disabled = !cont.projects.length;
@@ -606,7 +603,6 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#ac-cerrar").addEventListener("click", () => $("#dialogo-acerca").close());
   $("#ac-borrar").addEventListener("click", borrarTodoContinuar);
   $("#ac-recordar").addEventListener("change", async (e) => { if (!(await guardarPrefs({ recordar: e.target.checked }, "#ac-error"))) e.target.checked = !e.target.checked; });
-  $("#ac-mostrar-tl").addEventListener("change", async (e) => { if (await guardarPrefs({ show_maker_links: e.target.checked }, "#ac-error")) pintarAcerca(); else e.target.checked = !e.target.checked; });
   $("#pc-guardar").addEventListener("click", guardarNota);
   $("#pc-olvidar").addEventListener("click", olvidarItem);
   $("#bv-form").addEventListener("submit", (e) => { e.preventDefault(); escanear($("#bv-ruta").value.trim()); });

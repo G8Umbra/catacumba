@@ -47,7 +47,7 @@ TIPOS = {"repo": "Repository", "proyecto": "Project", "carpeta": "Folder", "pagi
 TEMAS = {"liso", "noche", "blueprint", "compass", "frio", "atardecer", "bosque", "foto"}
 BUSCADORES = {"duckduckgo", "google"}
 PREFERENCIAS = {"fondo": "noche", "foto": "", "buscador": "duckduckgo", "favoritos": [],
-                "recordar": True, "show_maker_links": True}
+                "recordar": True}
 FOTOS_RAICES = [HOME / "Pictures", HOME / "Imágenes", HOME / "Desktop", Path("/usr/share/backgrounds")]
 EXT_FOTO = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}
 FOTO_MAX = 15 * 1024 * 1024
@@ -329,11 +329,10 @@ def validar_preferencias(datos, actuales):
         ) or len(set(favoritos)) != len(favoritos):
             raise ValueError("The favorites list is not valid")
         nuevas["favoritos"] = favoritos
-    for clave in ("recordar", "show_maker_links"):
-        if clave in datos:
-            if not isinstance(datos[clave], bool):
-                raise ValueError(f"{clave} must be true or false")
-            nuevas[clave] = datos[clave]
+    if "recordar" in datos:
+        if not isinstance(datos["recordar"], bool):
+            raise ValueError("recordar must be true or false")
+        nuevas["recordar"] = datos["recordar"]
     if nuevas["fondo"] == "foto" and not nuevas["foto"]:
         raise ValueError("Pick a photo first")
     return nuevas
@@ -601,8 +600,7 @@ def continue_summary():
 
 def about():
     return {"version": VERSION, "config_path": str(CONFIG), "continue_path": str(continue_path()),
-            "edition": PLUGIN["name"] if PLUGIN else "Community", "plugin_error": PLUGIN_ERROR,
-            "slogan": "Better Diagnostics, Better Decisions, Better Lives."}
+            "edition": PLUGIN["name"] if PLUGIN else "Community", "plugin_error": PLUGIN_ERROR}
 
 
 def plugin_info():

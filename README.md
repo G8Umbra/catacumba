@@ -6,9 +6,7 @@ Catacumba is a small local app that lists your code repositories, project folder
 in one place, lets you search and sort them, and remembers where you stopped in each one, so you can pick up the
 next day without hunting for files. It runs on your own computer and nothing leaves it.
 
-*Better Diagnostics, Better Decisions, Better Lives.*
-
-Catacumba Community is made by G8Umbra, associated with TempLogic Systems (https://templogicsystems.com/).
+Catacumba Community is made by G8Umbra.
 
 ## What you get
 
@@ -28,7 +26,6 @@ Catacumba Community is made by G8Umbra, associated with TempLogic Systems (https
 - **Comfortable to use.** Works from phone width up, light and dark theme (follows your system, or pick one),
   full keyboard use, visible focus, skip link, reduced-motion respected.
 - **A small extra tool:** an ASCII banner maker for text headers.
-- **Optional, easy to ignore:** an About page with an optional section of plain links about its maker. It can be hidden with one checkbox.
 
 ## Run it
 

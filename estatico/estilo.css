@@ -140,9 +140,6 @@ kbd{font:inherit;font-size:.8rem;padding:1px 6px;border:1px solid var(--linea);b
 .rutas dd{margin:0;font-family:ui-monospace,monospace;overflow-wrap:anywhere}
 .ac-buscadas{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .ac-buscadas li{display:flex;gap:8px;align-items:center;justify-content:space-between;overflow-wrap:anywhere}
-.ac-maker{margin-top:12px;padding:10px 12px;border:1px dashed var(--linea);border-radius:12px}
-.ac-maker h3{margin-top:0}
-.ac-maker a{color:var(--azul)}
 @media (max-width:600px){
   header{padding:10px 14px}
   .acciones{flex-wrap:wrap;width:100%}
