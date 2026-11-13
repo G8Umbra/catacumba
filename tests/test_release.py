@@ -208,6 +208,12 @@ class TestRemovedFeaturesStayRemoved(unittest.TestCase):
             for w in self.WORDS:
                 self.assertNotIn(w, txt, f"{f.relative_to(ROOT)} still mentions a removed feature ({w})")
 
+    def test_the_readme_license_section_starts_with_the_pseudonymous_copyright_line(self):
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        section = readme.split("## License", 1)[1].lstrip("\n").splitlines()
+        self.assertEqual(section[0], "Copyright (c) 2026 G8Umbra")
+        self.assertEqual(readme.count("Copyright (c)"), 1)           # one holder line, no other names or organisations
+
     def test_the_remaining_tabs_and_views_are_consistent(self):
         html = (STATIC / "index.html").read_text(encoding="utf-8")
         js = (STATIC / "app.js").read_text(encoding="utf-8")

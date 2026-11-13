@@ -94,6 +94,8 @@ Catacumba Community is developed with AI assistance (Claude Code, by Anthropic) 
 
 ## License
 
+Copyright (c) 2026 G8Umbra
+
 Catacumba Community is licensed under the **Mozilla Public License 2.0 (MPL-2.0)**; every source file carries its
 notice and an `SPDX-License-Identifier: MPL-2.0` line, and the full text is in the `LICENSE` file of a release.
 In plain terms: you may use, change and share Catacumba freely, including in your own projects. If you change a file
