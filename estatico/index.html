@@ -1,0 +1,247 @@
+<!doctype html>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  SPDX-License-Identifier: MPL-2.0 -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Catacumba</title>
+<link rel="icon" href="/estatico/icono.svg">
+<link rel="stylesheet" href="/estatico/estilo.css">
+<script src="/estatico/app.js" defer></script>
+<link rel="stylesheet" href="/estatico/pomodoro.css">
+<script src="/estatico/pomodoro.js" defer></script>
+<link rel="stylesheet" href="/estatico/ascii.css">
+<script src="/estatico/ascii.js" defer></script>
+</head>
+<body>
+<a class="saltar" href="#principal">Skip to the content</a>
+<header>
+  <div class="marca"><img src="/estatico/icono.svg" alt=""><div><h1>Catacumba</h1><p id="maquina">&nbsp;</p></div></div>
+  <div class="busquedas">
+    <input id="buscar" type="search" placeholder="Search your Catacumba…" aria-label="Search your Catacumba" autocomplete="off">
+    <form id="form-web" role="search"><input id="web" type="search" placeholder="Search the web…" aria-label="Search the web" autocomplete="off"></form>
+  </div>
+  <div class="acciones">
+    <button id="fondo" type="button" title="Change the background and the search engine">Background</button>
+    <button id="refrescar" type="button" title="Read everything again">Refresh</button>
+    <button id="tema" type="button" title="Switch between automatic, light and dark">Theme: auto</button>
+    <button id="acerca" type="button" title="About Catacumba, your data and privacy" aria-haspopup="dialog">About</button>
+    <button id="agregar" type="button" class="primario">+ Add</button>
+  </div>
+</header>
+<nav id="pestanas" aria-label="Secciones">
+  <button type="button" data-tipo="todo" class="activa">All</button>
+  <button type="button" data-tipo="repo">Repositories</button>
+  <button type="button" data-tipo="proyecto">Projects</button>
+  <button type="button" data-tipo="carpeta">Folders</button>
+  <button type="button" data-tipo="pagina">Pages</button>
+  <button type="button" data-tipo="favoritos">Favorites</button>
+  <button type="button" data-tipo="fragmentos">Snippets</button>
+  <button type="button" data-tipo="pomodoro">Pomodoro</button>
+  <button type="button" data-tipo="ascii">ASCII art</button>
+</nav>
+<main id="principal" tabindex="-1">
+  <p id="almacenamiento" class="error" role="alert" hidden></p>
+  <section id="bienvenida" hidden aria-labelledby="bv-titulo" lang="en">
+    <h2 id="bv-titulo" tabindex="-1">Welcome to Catacumba</h2>
+    <p class="bv-lead">One screen for your projects, repositories, folders and web pages, so you can find them fast and pick up where you left off.</p>
+    <ul class="bv-promesas">
+      <li><strong>Free, no account.</strong> There is nothing to sign up for.</li>
+      <li><strong>Private.</strong> Everything stays on this computer. Catacumba sends nothing anywhere.</li>
+      <li><strong>Read-only.</strong> It looks and opens. It never changes, moves or deletes your files.</li>
+    </ul>
+    <h3>Step 1. Tell Catacumba where your projects are</h3>
+    <div id="bv-sugerencias" class="bv-sugerencias" role="group" aria-label="Folders that look like they hold projects"></div>
+    <form id="bv-form" class="bv-form">
+      <label for="bv-ruta">Or type a folder path</label>
+      <input id="bv-ruta" name="ruta" list="bv-lista" autocomplete="off" spellcheck="false" placeholder="/home/you/projects">
+      <datalist id="bv-lista"></datalist>
+      <div class="botones">
+        <button type="submit" id="bv-buscar" class="primario">Find my git projects in it</button>
+        <button type="button" id="bv-uno">Add it as one project</button>
+      </div>
+    </form>
+    <p id="bv-error" class="error" role="alert"></p>
+    <h3>Not sure?</h3>
+    <p class="nota">Pick a folder above. Catacumba looks up to three levels deep for folders managed with git. If your folder is not a git project, add it as one project. You can add web pages with <strong>+ Add</strong> and change all of this later in <strong>About</strong>.</p>
+  </section>
+  <div id="barra-vista" class="barra-vista" hidden lang="en">
+    <label>Sort by
+      <select id="orden">
+        <option value="recent">Latest change</option>
+        <option value="opened">Recently opened</option>
+        <option value="name">Name A to Z</option>
+        <option value="name-desc">Name Z to A</option>
+        <option value="unsaved">Most unsaved changes</option>
+      </select>
+    </label>
+    <label class="casilla"><input type="checkbox" id="solo-sin-guardar"> Only with unsaved changes</label>
+    <span id="conteo" class="conteo" role="status"></span>
+  </div>
+  <section id="continuar" hidden aria-labelledby="continuar-titulo" lang="en">
+    <h2 id="continuar-titulo">Continue where you left off</h2>
+    <div id="continuar-lista" class="continuar-lista"></div>
+  </section>
+  <p id="aviso" role="status"></p>
+  <section id="tarjetas" aria-live="polite"></section>
+  <section id="fragmentos" hidden aria-labelledby="fragmentos-titulo">
+    <div class="fragmentos-cabecera">
+      <div><h2 id="fragmentos-titulo">Snippets</h2><p class="nota">Saved in this browser; they are never run or sent anywhere.</p></div>
+      <div class="fragmentos-acciones">
+        <input id="buscar-fragmentos" type="search" placeholder="Search snippets…" aria-label="Search snippets" autocomplete="off">
+        <button id="nuevo-fragmento" type="button" class="primario">+ New snippet</button>
+      </div>
+    </div>
+    <p id="fragmentos-aviso" role="status" aria-live="polite"></p>
+    <div id="lista-fragmentos"></div>
+  </section>
+  <section id="pomodoro" hidden aria-labelledby="pomodoro-titulo">
+    <div class="pomodoro-shell">
+      <div class="pomodoro-cabecera">
+        <div><span class="pomodoro-etiqueta">MODO</span><h2 id="pomodoro-modo">FOCUS</h2></div>
+        <span id="pomodoro-sesion">Session 1/4</span>
+      </div>
+      <h2 id="pomodoro-titulo" class="pomodoro-titulo">Pomodoro</h2>
+      <p id="pomodoro-reloj" class="pomodoro-reloj" role="timer" aria-live="off">25:00</p>
+      <progress id="pomodoro-progreso" max="1500" value="1500" aria-label="Timer progress"></progress>
+      <div class="pomodoro-controles">
+        <button id="pomodoro-toggle" type="button" class="primario">Start</button>
+        <button id="pomodoro-reset" type="button">Reset</button>
+      </div>
+      <div class="pomodoro-modos" role="group" aria-label="Timer length">
+        <button type="button" data-pomodoro-mode="work" aria-pressed="true">Focus · 25 min</button>
+        <button type="button" data-pomodoro-mode="short" aria-pressed="false">Break · 5 min</button>
+        <button type="button" data-pomodoro-mode="long" aria-pressed="false">Long break · 15 min</button>
+      </div>
+      <p id="pomodoro-aviso" role="status" aria-live="polite">Ready to focus.</p>
+    </div>
+  </section>
+  <section id="ascii-studio" hidden aria-labelledby="ascii-titulo">
+    <div class="ascii-shell">
+      <div class="ascii-cabecera">
+        <div><p class="ascii-etiqueta">LOCAL TOOL</p><h2 id="ascii-titulo">ASCII art</h2></div>
+        <p class="nota">Text banners for code headers.</p>
+      </div>
+      <label for="ascii-texto">Text</label>
+      <input id="ascii-texto" type="text" value="CATACUMBA" maxlength="32" autocomplete="off" spellcheck="false">
+      <div class="ascii-presets" role="group" aria-label="Example texts">
+        <button type="button" data-ascii-preset="MY PROJECT">My project</button>
+        <button type="button" data-ascii-preset="NODE V4">Node V4</button>
+        <button type="button" data-ascii-preset="STATUS OK">Status OK</button>
+        <button type="button" data-ascii-preset="SYSTEM ERROR">System error</button>
+      </div>
+      <div class="ascii-resultado-cabecera">
+        <h3>Result</h3>
+        <button id="ascii-copiar" type="button" class="primario">Copy</button>
+      </div>
+      <pre id="ascii-output" aria-label="Result as ASCII art"></pre>
+      <p id="ascii-aviso" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+</main>
+
+<aside id="panel" hidden aria-label="Details">
+  <div class="panel-cabeza"><h2 id="p-nombre"></h2><button type="button" id="cerrar" aria-label="Close">✕</button></div>
+  <p id="p-donde" class="ruta"></p>
+  <div id="p-datos" class="datos"></div>
+  <div id="p-botones" class="botones"></div>
+  <p id="p-resultado" class="resultado" role="status"></p>
+  <section id="p-continuar" class="p-continuar" aria-labelledby="pc-titulo" lang="en">
+    <h3 id="pc-titulo">Where I left off</h3>
+    <p id="pc-previo" class="nota"></p>
+    <ul id="pc-archivos" class="pc-archivos"></ul>
+    <label for="pc-nota">Note to my future self</label>
+    <textarea id="pc-nota" maxlength="500" rows="3" placeholder="What were you doing? What is the next step?"></textarea>
+    <div class="botones">
+      <button type="button" id="pc-guardar" class="primario">Save note</button>
+      <button type="button" id="pc-olvidar">Forget this item's history</button>
+    </div>
+    <p id="pc-estado" class="nota" role="status"></p>
+  </section>
+  <div id="p-cuerpo"></div>
+</aside>
+
+<dialog id="dialogo-fondo" aria-labelledby="t-fondo">
+  <form method="dialog" id="form-fondo">
+    <h2 id="t-fondo">Background and search engine</h2>
+    <p class="nota">Saved on this computer.</p>
+    <div id="temas" class="temas"></div>
+    <h3>Or one of your photos</h3>
+    <p class="nota">From your pictures folder, the desktop or the system backgrounds.</p>
+    <div id="fotos" class="fotos"><p class="nota">Looking for photos…</p></div>
+    <label>Search the web with
+      <select id="buscador"><option value="duckduckgo">DuckDuckGo (does not keep what you search)</option><option value="google">Google</option></select>
+    </label>
+    <p id="f-error" class="error" role="alert"></p>
+    <div class="botones"><button type="button" id="f-cerrar" class="primario">Done</button></div>
+  </form>
+</dialog>
+
+<dialog id="dialogo-fragmento" aria-labelledby="t-fragmento">
+  <form id="form-fragmento">
+    <h2 id="t-fragmento">New snippet</h2>
+    <label>Title <input name="titulo" required maxlength="100" autocomplete="off"></label>
+    <label>Code or command <textarea name="codigo" required maxlength="20000" rows="8" spellcheck="false"></textarea></label>
+    <p id="fragmento-error" class="error" role="alert"></p>
+    <div class="botones">
+      <button type="button" id="fragmento-cancelar">Cancel</button>
+      <button type="submit" class="primario">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dialogo" aria-labelledby="t-agregar">
+  <form id="form-agregar" method="dialog">
+    <h2 id="t-agregar">Add to the list</h2>
+    <p class="nota">This only adds it to this list. Nothing is moved or copied.</p>
+    <label>Name <input name="nombre" required maxlength="80"></label>
+    <label>Kind
+      <select name="tipo">
+        <option value="carpeta">A folder</option>
+        <option value="proyecto">A project (folder)</option>
+        <option value="pagina">A page (web address)</option>
+      </select>
+    </label>
+    <label>Where it is <input name="donde" required placeholder="/home/… or https://…"></label>
+    <label>Note (optional) <input name="nota" maxlength="120"></label>
+    <p id="d-error" class="error" role="alert"></p>
+    <div class="botones">
+      <button type="button" id="d-cancelar">Cancel</button>
+      <button type="submit" class="primario">Add</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dialogo-acerca" aria-labelledby="ac-titulo" lang="en">
+  <form method="dialog" id="form-acerca">
+    <h2 id="ac-titulo">About Catacumba</h2>
+    <p class="nota"><span id="ac-edicion">Community</span> edition, version <span id="ac-version"></span>. <em id="ac-lema"></em></p>
+    <p>Catacumba lists your projects, repositories, folders and web pages on one local screen and remembers where you left off. It runs on this computer only, needs no account, and sends nothing anywhere.</p>
+    <h3>Your data</h3>
+    <p class="nota">Everything Catacumba saves is in these files. You can open, copy or delete them yourself.</p>
+    <dl class="rutas"><dt>Your list and settings</dt><dd id="ac-config"></dd><dt>Where you left off</dt><dd id="ac-continue"></dd></dl>
+    <label class="casilla"><input type="checkbox" id="ac-recordar"> Remember where I left off (last opened, recently changed files, my notes)</label>
+    <p id="ac-cuenta" class="nota" role="status"></p>
+    <div class="botones">
+      <a id="ac-exportar" class="boton" href="/api/continue/export" download="catacumba-continue.json">Export as a file</a>
+      <button type="button" id="ac-borrar">Clear all of it</button>
+    </div>
+    <h3>Folders searched for git projects</h3>
+    <ul id="ac-buscadas" class="ac-buscadas"></ul>
+    <section id="ac-maker" class="ac-maker" aria-labelledby="ac-tl-titulo">
+      <h3 id="ac-tl-titulo">About the maker</h3>
+      <p id="ac-tl-texto">Catacumba Community is made by G8Umbra, associated with TempLogic Systems. This is optional information: Catacumba works the same without it, and the link below is a plain link that nothing loads in the background.</p>
+      <p id="ac-tl-enlaces"><a href="https://templogicsystems.com/" target="_blank" rel="noopener noreferrer">templogicsystems.com</a></p>
+    </section>
+    <label class="casilla"><input type="checkbox" id="ac-mostrar-tl"> Show the TempLogic Systems section</label>
+    <h3>Keyboard</h3>
+    <p class="nota"><kbd>/</kbd> search your list &middot; <kbd>Esc</kbd> close this panel &middot; <kbd>Tab</kbd> move between buttons</p>
+    <p id="ac-error" class="error" role="alert"></p>
+    <div class="botones"><button type="button" id="ac-cerrar" class="primario">Close</button></div>
+  </form>
+</dialog>
+</body>
+</html>

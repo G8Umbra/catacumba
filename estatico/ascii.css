@@ -1,0 +1,20 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ * SPDX-License-Identifier: MPL-2.0 */
+#ascii-studio[hidden]{display:none}
+.ascii-shell{width:min(100%,880px);margin:4px auto 0;padding:18px;background:var(--tarjeta);border:1px solid var(--linea);border-radius:8px;box-shadow:var(--sombra)}
+.ascii-cabecera{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.ascii-cabecera h2{margin:2px 0 0;font-size:1.1rem}
+.ascii-etiqueta{margin:0;color:var(--azul);font-size:.72rem;font-weight:700}
+.ascii-shell>label{display:block;margin-bottom:5px;color:var(--suave);font-size:.88rem}
+#ascii-texto{width:100%;padding:10px 12px;border:1px solid var(--linea);border-radius:8px;background:var(--fondo);color:var(--texto);font:inherit}
+#ascii-texto:focus-visible,.ascii-shell button:focus-visible{outline:3px solid var(--azul);outline-offset:2px}
+.ascii-presets{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
+.ascii-presets button{font-size:.82rem}
+.ascii-resultado-cabecera{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ascii-resultado-cabecera h3{margin:0;font-size:.95rem}
+#ascii-output{min-height:7.5rem;margin:10px 0 0;padding:14px;overflow:auto;border:1px solid var(--linea);border-radius:8px;background:var(--fondo);color:var(--verde);font:13px/1.15 ui-monospace,monospace;white-space:pre;tab-size:2}
+#ascii-aviso{min-height:1.3em;margin:8px 0 0;color:var(--suave);font-size:.86rem}
+body.con-fondo .ascii-shell{background:color-mix(in srgb,var(--tarjeta) 84%,transparent);backdrop-filter:blur(3px)}
+@media(max-width:520px){.ascii-shell{padding:14px}.ascii-cabecera{align-items:start;flex-direction:column}#ascii-output{font-size:12px}}
